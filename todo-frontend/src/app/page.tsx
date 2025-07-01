@@ -13,14 +13,15 @@ export default function Home() {
     priority: "",
   });
 
+  // Filter tasks based on selected filter options
   const filteredTasks = tasks.filter((task) => {
     const statusMatch =
       filter.status === "" ||
       (filter.status === "completed" && task.isCompleted) ||
-      (filter.status === "incomplete" && !task.isCompleted);
+      (filter.status === "incomplete" && !task.isCompleted); // Fix for incomplete tasks
 
     const categoryMatch =
-      filter.category === "" || task.category === filter.category;
+      filter.category === "" || task.category?.toLowerCase() === filter.category.toLowerCase();
 
     const priorityMatch =
       filter.priority === "" || task.priority.toString() === filter.priority;
@@ -46,6 +47,7 @@ export default function Home() {
         </button>
       </div>
 
+      {/* Pass filter change handler to FilterBar */}
       <FilterBar onFilterChange={setFilter} />
 
       <div className="mb-4 text-sm text-gray-400">
@@ -66,7 +68,7 @@ export default function Home() {
 
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
-      {!loading && !error && <TaskList tasks={filteredTasks} />}
+      {!loading && !error && <TaskList tasks={filteredTasks} refetch={refetch} />}
     </div>
   );
 }

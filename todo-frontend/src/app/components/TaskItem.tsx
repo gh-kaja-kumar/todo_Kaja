@@ -1,26 +1,42 @@
 import Link from "next/link";
+import axios from "axios";
+import { Task } from "../hooks/types";
 
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  dueDate: string;
-  isCompleted: boolean;
-  priority: number;
-  category: string;
-  appUserId: number;
+export interface TaskItemProps {
+  task: Task;
+  refetch: () => void;
 }
 
-export default function TaskItem({ task }: { task: Task }) {
+export default function TaskItem({
+  task,
+  refetch,
+}: {
+  task: Task;
+  refetch: () => void;
+}) {
+  const handleCheckboxChange = async () => {
+    try {
+      await axios.put(`http://localhost:5025/api/TodoItems/${task.id}`, {
+        ...task,
+        isCompleted: !task.isCompleted, // Toggle the completed status
+      });
+      refetch(); // Refresh the task list after updating
+    } catch (error) {
+      console.error("Failed to update task:", error);
+      alert("Error updating task");
+    }
+  };
+
   return (
     <li className="border p-4 rounded shadow">
       <div className="flex justify-between items-start">
         <div>
+          {/* Checkbox to mark task as completed */}
           <input
             type="checkbox"
             checked={task.isCompleted}
-            readOnly
-            className="mr-2"
+            onChange={handleCheckboxChange} // Handle checkbox change
+            className="mr-2 cursor-pointer"
           />
           <span
             className={task.isCompleted ? "line-through text-gray-400" : ""}
@@ -28,8 +44,14 @@ export default function TaskItem({ task }: { task: Task }) {
             {task.title}
           </span>
           <div className="text-sm text-gray-500 mt-1">
-            Due: {task.dueDate?.split("T")[0]} | Category: {task.category} |
-            Priority: {task.priority}
+            Due: {task.dueDate?.split("T")[0]} | Category: {task.category} | Priority:{" "}
+            {task.priority === 0
+              ? "Low"
+              : task.priority === 1
+              ? "Normal"
+              : task.priority === 2
+              ? "High"
+              : "Unknown"}
           </div>
         </div>
         <div className="text-sm space-x-2">
@@ -39,15 +61,23 @@ export default function TaskItem({ task }: { task: Task }) {
             </button>
           </Link>
 
-          <button
-            onClick={() => alert("Edit not implemented")}
-            className="text-yellow-600"
-          >
+          <Link href={`/edit-task/${task.id}`} className="text-yellow-600">
             Edit
-          </button>
+          </Link>
+
           <button
-            onClick={() => alert("Delete not implemented")}
-            className="text-red-600"
+            onClick={async () => {
+              try {
+                await axios.delete(
+                  `http://localhost:5025/api/TodoItems/${task.id}`
+                );
+                refetch();
+              } catch (error) {
+                console.error("Delete failed", error);
+                alert("Error deleting task");
+              }
+            }}
+            className="text-red-500 hover:text-red-700 transition-colors cursor-pointer"
           >
             Delete
           </button>
