@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,59 +18,65 @@ namespace TodoApi.Controllers
     {
         private readonly TodoDbContext _context;
 
-        // Hardcoded UserId for now
-        private const int HardcodedUserId = 1;
-
         public TodoItemsController(TodoDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/TodoItems
+        // ✅ GET: api/TodoItems
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
         {
-            // Fetch tasks only for the hardcoded user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return Unauthorized();
+
             return await _context.TodoItems
-                .Where(t => t.AppUserId == HardcodedUserId)
+                .Where(t => t.AppUserId == int.Parse(userId))
                 .ToListAsync();
         }
 
-        // GET: api/TodoItems/5
+        // ✅ GET: api/TodoItems/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItem>> GetTodoItem(int id)
         {
-            // Fetch the task only if it belongs to the hardcoded user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return Unauthorized();
+
             var todoItem = await _context.TodoItems
-                .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == HardcodedUserId);
+                .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == int.Parse(userId));
 
             if (todoItem == null)
-            {
                 return NotFound();
-            }
 
             return todoItem;
         }
 
-        // PUT: api/TodoItems/5
+        // ✅ PUT: api/TodoItems/5
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTodoItem(int id, TodoItem todoItem)
         {
-            if (id != todoItem.Id)
-            {
-                return BadRequest();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Ensure the task belongs to the hardcoded user
+            if (userId == null)
+                return Unauthorized();
+
+            if (id != todoItem.Id)
+                return BadRequest();
+
             var existingTodoItem = await _context.TodoItems
-                .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == HardcodedUserId);
+                .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == int.Parse(userId));
 
             if (existingTodoItem == null)
-            {
                 return NotFound("Task not found or does not belong to the user.");
-            }
 
-            // Update the task
+            // Update fields
             existingTodoItem.Title = todoItem.Title;
             existingTodoItem.Description = todoItem.Description;
             existingTodoItem.DueDate = todoItem.DueDate;
@@ -76,33 +84,22 @@ namespace TodoApi.Controllers
             existingTodoItem.Priority = todoItem.Priority;
             existingTodoItem.Category = todoItem.Category;
 
-            _context.Entry(existingTodoItem).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TodoItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // POST: api/TodoItems
+        // ✅ POST: api/TodoItems
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
         {
-            // Assign the hardcoded user to the task
-            todoItem.AppUserId = HardcodedUserId;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return Unauthorized();
+
+            todoItem.AppUserId = int.Parse(userId);
 
             _context.TodoItems.Add(todoItem);
             await _context.SaveChangesAsync();
@@ -110,18 +107,21 @@ namespace TodoApi.Controllers
             return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem);
         }
 
-        // DELETE: api/TodoItems/5
+        // ✅ DELETE: api/TodoItems/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodoItem(int id)
         {
-            // Ensure the task belongs to the hardcoded user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return Unauthorized();
+
             var todoItem = await _context.TodoItems
-                .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == HardcodedUserId);
+                .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == int.Parse(userId));
 
             if (todoItem == null)
-            {
                 return NotFound("Task not found or does not belong to the user.");
-            }
 
             _context.TodoItems.Remove(todoItem);
             await _context.SaveChangesAsync();
@@ -131,7 +131,9 @@ namespace TodoApi.Controllers
 
         private bool TodoItemExists(int id)
         {
-            return _context.TodoItems.Any(e => e.Id == id && e.AppUserId == HardcodedUserId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return _context.TodoItems.Any(e => e.Id == id && e.AppUserId == int.Parse(userId));
         }
     }
 }
