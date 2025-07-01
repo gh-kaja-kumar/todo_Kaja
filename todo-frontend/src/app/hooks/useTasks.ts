@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../../axiosConfig';
 import { Task } from './types'; // adjust path as needed
 
 const useTasks = () => {

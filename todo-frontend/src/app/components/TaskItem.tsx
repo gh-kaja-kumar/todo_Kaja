@@ -1,5 +1,5 @@
 import Link from "next/link";
-import axios from "axios";
+import axios from "../../axiosConfig";
 import { Task } from "../hooks/types";
 
 export interface TaskItemProps {

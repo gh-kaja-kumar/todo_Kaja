@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios';
+import axios from '../../axiosConfig';
 import { useRouter } from 'next/navigation';
 
 export default function AddTaskPage() {
