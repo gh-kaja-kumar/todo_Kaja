@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using TodoApi.Data;
+using TodoApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,10 +83,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// ✅ Register your custom services
+builder.Services.AddScoped<ITodoService, TodoService>();
+
 var app = builder.Build();
 
 // ✅ Use CORS before controllers
 app.UseCors("AllowFrontend");
+
+
 
 if (app.Environment.IsDevelopment())
 {
