@@ -64,38 +64,47 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
 ## Features
 
 1. **Add New Tasks**  
-   Create tasks with details like title, description, due date, priority, and category.
+   Users can create tasks with title, description, due date, priority, and category.
 
 2. **View Tasks**  
-   Display all your tasks in a clean, organized list for easy tracking and management.
+   Tasks are displayed in a user-friendly list with filtering and progress tracking.
 
-3. **Edit Tasks**  
-   Modify existing tasks to update their details.
+3. **Edit & Delete Tasks**  
+   Users can edit or delete their own tasks. Admins can manage all tasks.
 
 4. **Mark Tasks as Completed**  
-   Easily mark tasks as done to track your progress.
+   Users can track task completion via checkboxes.
 
-5. **Delete Tasks**  
-   Remove tasks that are no longer needed.
-
-6. **Filter Tasks**  
+5. **Filter & Sort Tasks**  
    Filter tasks by:
-   - **Status**: View completed or incomplete tasks  
-   - **Priority**: Filter by urgency level (Normal, High, Critical)  
-   - **Category**: Group tasks based on user-defined categories
+   - **Status** (completed, incomplete, overdue)
+   - **Priority** (Low, Normal, High)
+   - **Category** (e.g., Work, Personal)  
+   Tasks are also sorted by **Due Date** by default.
+
+6. **Overdue Highlight**  
+   Overdue tasks are visually marked with a red “Overdue” label for quick recognition.
 
 7. **Prioritize Tasks**  
-   Assign priority levels to tasks to help focus on what's important.
+   Toggle between priority levels using the star icon.
 
-8. **Login & Logout with JWT**  
-   Secure authentication using JSON Web Tokens (JWT). Only logged-in users can view and manage their tasks.
+8. **Multi-User Support**  
+   Each user has their own tasks. JWT-based login ensures only authenticated users access their data.
 
-9. **Responsive Design**  
-   Optimized layout that works smoothly on both desktop and mobile devices.
+9. **Admin Mode**  
+   Admins can:
+   - View and manage tasks of any user via `/admin/{userId}`
+   - Edit or delete any task (without restrictions)
+   - Assign tasks to other users
 
-10. **Data Persistence**  
-    Tasks are stored in a SQLite database for reliable, long-term storage.
+10. **Authentication (JWT)**  
+    Secure login and logout with JSON Web Tokens.
 
+11. **Responsive UI**  
+    Clean, mobile-friendly layout using Tailwind CSS.
+
+12. **Persistent Storage**  
+    All data is stored in a SQLite database using a .NET backend.
 
 ---
 
@@ -104,29 +113,31 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
 Users can interact with the application by:
 
 1. **Register / Login**  
-   Access the app by signing up or logging in with your credentials.
+   Sign up or log in to access your personalized task dashboard. Auth is handled via JWT.
 
 2. **Create a Task**  
-   Click on "+ Add New Task" and fill in details such as title, due date, priority, etc.
+   Click on "+ Add New Task" and enter task details like title, due date, category, and priority.
 
 3. **View Tasks**  
-   All tasks are shown on the dashboard, organized by date and status.
+   Your tasks are listed and sorted by due date with clear status and priority indicators.
 
-4. **Filter by Category, Status, or Priority**  
-   Use the filter bar to view specific tasks relevant to your needs.
+4. **Filter by Status, Category, or Priority**  
+   Use the filter bar to quickly find tasks based on your preferences.
 
-5. **Edit Existing Tasks**  
-   Use the edit icon to change task details anytime.
+5. **Track Completion**  
+   Mark tasks as completed using the checkbox. Progress is displayed via a progress bar.
 
-6. **Track Completion**  
-   Tick the checkbox to mark a task as completed — real-time progress is shown with stats.
+6. **Edit & Delete Tasks**  
+   You can edit or delete your own tasks anytime. Admins can manage tasks for any user.
 
-7. **Delete Irrelevant Tasks**  
-   Remove tasks permanently using the delete button.
+7. **Overdue Tasks**  
+   Tasks past their due date are automatically labeled as **Overdue** for visibility.
 
-8. **Logout**  
-   End your session by clicking the logout button (token will be cleared from storage).
+8. **Admin Actions**  
+   Admins can access `/admin/{userId}` to manage another user’s tasks fully.
 
+9. **Logout**  
+   End your session securely using the logout button, which clears your token from local storage.
 
 ---
 
@@ -154,41 +165,52 @@ GitHub Copilot was instrumental in the development process by:
 ### Backend (`TodoApi`)
 ```plaintext
 TodoApi/
-├── Controllers/
-│   ├── UsersController.cs
-│   ├── TodoItemsController.cs
-├── Data/
-│   ├── TodoDbContext.cs
-├── Models/
-│   ├── AppUser.cs
-│   ├── TodoItem.cs
-├── Migrations/
-│   ├── SeededData.Designer.cs
-├── Program.cs
-├── appsettings.json
-├── appsettings.Development.json
+├── .github/                # GitHub workflows and configurations
+├── Controllers/            # API controllers
+│   ├── UsersController.cs  # Handles user-related endpoints
+│   ├── TodoItemsController.cs # Handles task-related endpoints
+├── Data/                   # Database context and configurations
+│   ├── TodoDbContext.cs    # Entity Framework database context
+├── DTOs/                   # Data Transfer Objects
+│   ├── RegisterDto.cs      # DTO for user registration
+│   ├── LoginDto.cs         # DTO for user login
+├── Migrations/             # EF Core migrations
+│   ├── SeededData.Designer.cs # Migration for seeded data
+├── Models/                 # Database models
+│   ├── AppUser.cs          # User model
+│   ├── TodoItem.cs         # Task model
+├── Services/               # Business logic services
+│   ├── IUserService.cs     # Interface for user service
+│   ├── UserService.cs      # Implementation of user service
+├── appsettings.json        # Application settings
+├── appsettings.Development.json # Development-specific settings
+├── Program.cs              # Entry point for the backend application
+├── TodoApi.csproj          # Project file for the backend
+├── todo.db                 # SQLite database file
 ```
 
 ### Frontend (`todo-frontend`)
 ```plaintext
 todo-frontend/
-├── src/
-│   ├── app/
-│   │   ├── components/
-│   │   │   ├── TaskList.tsx
-│   │   │   ├── TaskItem.tsx
-│   │   ├── hooks/
-│   │   │   ├── useTasks.ts
-│   │   │   ├── types.ts
-│   │   ├── edit-task/
-│   │   │   ├── [id]/page.tsx
-│   │   ├── signup/
-│   │   │   ├── page.tsx
-│   │   ├── login/
-│   │   │   ├── page.tsx
-│   ├── axiosConfig.ts
-├── public/
-├── package.json
-├── tsconfig.json
+├── .next/                  # Next.js build output
+├── public/                 # Static assets
+├── src/                    # Source code
+│   ├── app/                # Application pages and components
+│   │   ├── components/     # Reusable UI components
+│   │   │   ├── TaskList.tsx # Component for displaying task lists
+│   │   │   ├── TaskItem.tsx # Component for individual task items
+│   │   ├── hooks/          # Custom React hooks
+│   │   │   ├── useTasks.ts # Hook for fetching tasks
+│   │   │   ├── types.ts    # Type definitions
+│   │   ├── edit-task/      # Edit task page
+│   │   │   ├── [id]/page.tsx # Dynamic route for editing tasks
+│   │   ├── signup/         # Signup page
+│   │   │   ├── page.tsx    # Signup form
+│   │   ├── login/          # Login page
+│   │   │   ├── page.tsx    # Login form
+│   ├── axiosConfig.ts      # Axios configuration for API requests
+├── package.json            # Project dependencies
+├── tsconfig.json           # TypeScript configuration
+├── next.config.ts          # Next.js configuration
 ```
 
