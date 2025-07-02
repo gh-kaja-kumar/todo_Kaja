@@ -85,6 +85,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // ✅ Register your custom services
 builder.Services.AddScoped<ITodoService, TodoService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 
 var app = builder.Build();
 

@@ -11,8 +11,8 @@ using TodoApi.Data;
 namespace TodoApi.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20250629093623_AddAppUserRelationAndSeedData")]
-    partial class AddAppUserRelationAndSeedData
+    [Migration("20250702092156_InitWithRoles")]
+    partial class InitWithRoles
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,10 @@ namespace TodoApi.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -46,15 +50,25 @@ namespace TodoApi.Migrations
                         new
                         {
                             Id = 1,
-                            Email = "user1@example.com",
-                            Password = "1234",
-                            Username = "user1"
+                            Email = "admin@example.com",
+                            Password = "admin",
+                            Role = "Admin",
+                            Username = "admin"
                         },
                         new
                         {
                             Id = 2,
+                            Email = "user1@example.com",
+                            Password = "1234",
+                            Role = "User",
+                            Username = "user1"
+                        },
+                        new
+                        {
+                            Id = 3,
                             Email = "user2@example.com",
                             Password = "1234",
+                            Role = "User",
                             Username = "user2"
                         });
                 });
@@ -68,7 +82,15 @@ namespace TodoApi.Migrations
                     b.Property<int>("AppUserId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AssignedToUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DueDate")
@@ -88,23 +110,31 @@ namespace TodoApi.Migrations
 
                     b.HasIndex("AppUserId");
 
+                    b.HasIndex("AssignedToUserId");
+
                     b.ToTable("TodoItems");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            AppUserId = 1,
-                            DueDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            AppUserId = 2,
+                            AssignedToUserId = 2,
+                            Category = "Personal",
+                            Description = "Wake up early in the morning",
+                            DueDate = new DateTime(2025, 7, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             IsCompleted = false,
-                            Priority = 0,
+                            Priority = 1,
                             Title = "Wake Up"
                         },
                         new
                         {
                             Id = 2,
-                            AppUserId = 1,
-                            DueDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            AppUserId = 2,
+                            AssignedToUserId = 3,
+                            Category = "Personal",
+                            Description = "Go to bed early",
+                            DueDate = new DateTime(2025, 7, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             IsCompleted = false,
                             Priority = 0,
                             Title = "Sleep"
@@ -112,37 +142,40 @@ namespace TodoApi.Migrations
                         new
                         {
                             Id = 3,
-                            AppUserId = 2,
-                            DueDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            AppUserId = 3,
+                            AssignedToUserId = 3,
+                            Category = "Health",
+                            Description = "Morning walk",
+                            DueDate = new DateTime(2025, 7, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             IsCompleted = false,
-                            Priority = 0,
-                            Title = "Wake Up"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AppUserId = 2,
-                            DueDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsCompleted = false,
-                            Priority = 0,
-                            Title = "Sleep"
+                            Priority = 2,
+                            Title = "Exercise"
                         });
                 });
 
             modelBuilder.Entity("TodoApi.Models.TodoItem", b =>
                 {
-                    b.HasOne("TodoApi.Models.AppUser", "AppUser")
-                        .WithMany("TodoItems")
+                    b.HasOne("TodoApi.Models.AppUser", "Owner")
+                        .WithMany("OwnedTasks")
                         .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("AppUser");
+                    b.HasOne("TodoApi.Models.AppUser", "AssignedToUser")
+                        .WithMany("AssignedTasks")
+                        .HasForeignKey("AssignedToUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AssignedToUser");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("TodoApi.Models.AppUser", b =>
                 {
-                    b.Navigation("TodoItems");
+                    b.Navigation("AssignedTasks");
+
+                    b.Navigation("OwnedTasks");
                 });
 #pragma warning restore 612, 618
         }
