@@ -24,8 +24,7 @@ export default function AddTaskPage() {
         dueDate,
         isCompleted: false,
         priority,
-        category,
-        appUserId: 1 // Dummy user
+        category
       });
       router.push('/');
     } catch (err: any) {

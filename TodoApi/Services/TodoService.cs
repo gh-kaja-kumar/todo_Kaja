@@ -17,7 +17,7 @@ namespace TodoApi.Services
         public async Task<IEnumerable<TodoItemDto>> GetTodosAsync(int userId)
         {
             return await _context.TodoItems
-                .Where(t => t.AppUserId == userId)
+                .Where(t => t.AppUserId == userId || t.AssignedToUserId == userId)
                 .Select(t => new TodoItemDto
                 {
                     Id = t.Id,
@@ -26,7 +26,9 @@ namespace TodoApi.Services
                     DueDate = t.DueDate,
                     IsCompleted = t.IsCompleted,
                     Priority = t.Priority,
-                    Category = t.Category
+                    Category = t.Category,
+                    AppUserId = t.AppUserId,
+                    AssignedToUserId = t.AssignedToUserId
                 })
                 .ToListAsync();
         }
@@ -34,7 +36,7 @@ namespace TodoApi.Services
         public async Task<TodoItemDto?> GetTodoItemByIdAsync(int id, int userId)
         {
             var item = await _context.TodoItems
-                .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == userId);
+                .FirstOrDefaultAsync(t => t.Id == id && (t.AppUserId == userId || t.AssignedToUserId == userId));
 
             if (item == null) return null;
 
@@ -46,7 +48,9 @@ namespace TodoApi.Services
                 DueDate = item.DueDate,
                 IsCompleted = item.IsCompleted,
                 Priority = item.Priority,
-                Category = item.Category
+                Category = item.Category,
+                AppUserId = item.AppUserId,
+                AssignedToUserId = item.AssignedToUserId
             };
         }
 
@@ -60,7 +64,8 @@ namespace TodoApi.Services
                 IsCompleted = dto.IsCompleted,
                 Priority = dto.Priority,
                 Category = dto.Category,
-                AppUserId = userId
+                AppUserId = userId,
+                AssignedToUserId = dto.AssignedToUserId ?? userId // default to current user
             };
 
             _context.TodoItems.Add(todo);
@@ -74,14 +79,15 @@ namespace TodoApi.Services
                 DueDate = todo.DueDate,
                 IsCompleted = todo.IsCompleted,
                 Priority = todo.Priority,
-                Category = todo.Category
+                Category = todo.Category,
+                AssignedToUserId = todo.AssignedToUserId
             };
         }
 
         public async Task<bool> UpdateTodoAsync(UpdateTodoItemDto dto, int userId)
         {
             var item = await _context.TodoItems
-                .FirstOrDefaultAsync(t => t.Id == dto.Id && t.AppUserId == userId);
+                .FirstOrDefaultAsync(t => t.Id == dto.Id && (t.AppUserId == userId || t.AssignedToUserId == userId));
 
             if (item == null) return false;
 
@@ -92,6 +98,12 @@ namespace TodoApi.Services
             item.Priority = dto.Priority;
             item.Category = dto.Category;
 
+            // Optional: allow admin to update AssignedToUserId
+            if (dto.AssignedToUserId.HasValue)
+            {
+                item.AssignedToUserId = dto.AssignedToUserId.Value;
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
@@ -99,7 +111,7 @@ namespace TodoApi.Services
         public async Task<bool> DeleteTodoAsync(int id, int userId)
         {
             var item = await _context.TodoItems
-                .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == userId);
+                .FirstOrDefaultAsync(t => t.Id == id && (t.AppUserId == userId || t.AssignedToUserId == userId));
 
             if (item == null) return false;
 

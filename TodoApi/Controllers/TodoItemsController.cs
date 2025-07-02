@@ -44,16 +44,16 @@ namespace TodoApi.Controllers
         }
 
         // POST: api/TodoItems - Create a new todo item
-        [Authorize]
-        [HttpPost]
-        public async Task<ActionResult<TodoItemDto>> PostTodoItem(CreateTodoItemDto dto)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null) return Unauthorized();
+            [Authorize]
+            [HttpPost]
+            public async Task<ActionResult<TodoItemDto>> PostTodoItem(CreateTodoItemDto dto)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null) return Unauthorized();
 
-            var createdItem = await _todoService.CreateTodoAsync(dto, int.Parse(userId));
-            return CreatedAtAction(nameof(GetTodoItem), new { id = createdItem.Id }, createdItem);
-        }
+                var createdItem = await _todoService.CreateTodoAsync(dto, int.Parse(userId));
+                return CreatedAtAction(nameof(GetTodoItem), new { id = createdItem.Id }, createdItem);
+            }
 
         // PUT: api/TodoItems/{id} - Update an existing todo item
         [Authorize]

@@ -60,7 +60,7 @@ namespace TodoApi.Data
                     IsCompleted = false,
                     Priority = 0,
                     Category = "Personal",
-                    AppUserId = 2,               // Owner is user1
+                    AppUserId = 1,               // Owner is admin
                     AssignedToUserId = 3         // Assigned to user2
                 },
                 new TodoItem

@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import axios from "../../axiosConfig";
 import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -13,8 +15,22 @@ export default function Login() {
     e.preventDefault();
     try {
       const response = await axios.post("/Users/login", { username, password });
-      localStorage.setItem("token", response.data.token); // Save JWT token
-      router.push("/");
+      const token = response.data.token;
+
+      // Save JWT token to localStorage
+      localStorage.setItem("token", token);
+
+      // Decode the token to check the user's role
+      const decoded: { [key: string]: any } = jwtDecode(token);
+      const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+      // Redirect based on role
+      console.log(decoded);
+      if (role === "Admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     } catch (err: any) {
       console.error(err.response?.data || "Login failed");
       setError(err.response?.data || "Login failed");

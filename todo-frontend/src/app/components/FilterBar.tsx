@@ -17,7 +17,6 @@ export default function FilterBar({ onFilterChange }: Props) {
   const [category, setCategory] = useState('');
   const [priority, setPriority] = useState('');
 
-  // Use effect to trigger filter change only when values change
   useEffect(() => {
     onFilterChange({ status, category, priority });
   }, [status, category, priority, onFilterChange]);
@@ -35,6 +34,7 @@ export default function FilterBar({ onFilterChange }: Props) {
           <option value="">All</option>
           <option value="completed">Completed</option>
           <option value="incomplete">Incomplete</option>
+          <option value="overdue">Overdue</option> {/* ✅ New */}
         </select>
       </div>
 

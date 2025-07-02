@@ -21,10 +21,15 @@ export default function Home() {
 
   // Filter tasks based on selected filter options
   const filteredTasks = tasks.filter((task) => {
+    const now = new Date();
+
     const statusMatch =
       filter.status === "" ||
       (filter.status === "completed" && task.isCompleted) ||
-      (filter.status === "incomplete" && !task.isCompleted);
+      (filter.status === "incomplete" && !task.isCompleted) ||
+      (filter.status === "overdue" &&
+        !task.isCompleted &&
+        new Date(task.dueDate) < now); // ✅ Added overdue logic
 
     const categoryMatch =
       filter.category === "" ||
@@ -35,6 +40,11 @@ export default function Home() {
 
     return statusMatch && categoryMatch && priorityMatch;
   });
+
+  // ✅ Sort by DueDate (oldest first)
+  const sortedTasks = filteredTasks.sort(
+    (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+  );
 
   const completedCount = filteredTasks.filter((t) => t.isCompleted).length;
   const incompleteCount = filteredTasks.length - completedCount;
@@ -85,8 +95,15 @@ export default function Home() {
         <div className="text-center text-gray-400 mt-10">
           <FilterBar onFilterChange={setFilter} />
           <p className="text-xl font-semibold">
-            Please <a href="/login" className="text-blue-400 underline">Login</a> or{" "}
-            <a href="/signup" className="text-purple-400 underline">Sign Up</a> to view your tasks.
+            Please{" "}
+            <a href="/login" className="text-blue-400 underline">
+              Login
+            </a>{" "}
+            or{" "}
+            <a href="/signup" className="text-purple-400 underline">
+              Sign Up
+            </a>{" "}
+            to view your tasks.
           </p>
         </div>
       ) : (
