@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Task } from "../../hooks/types";
-import axios from "../../../axiosConfig"; // ✅ Uses baseURL
+import axios from "../../../axiosConfig";
 
 const EditTask = () => {
   const router = useRouter();

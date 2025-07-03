@@ -5,7 +5,7 @@ using TodoApi.Services;
 namespace TodoApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] // Base route: api/users
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -15,6 +15,7 @@ namespace TodoApi.Controllers
             _userService = userService;
         }
 
+        // Route: POST api/users/signup
         [HttpPost("signup")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
@@ -25,6 +26,7 @@ namespace TodoApi.Controllers
             return Ok(result);
         }
 
+        // Route: POST api/users/login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
