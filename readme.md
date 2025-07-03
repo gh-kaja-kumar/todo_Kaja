@@ -33,7 +33,7 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
 ---
 
 ### Frontend Setup (todo-frontend)
-1. Navigate to the frontend directory:
+1. Navigate to the frontend directory(Open new terminal):
     ```bash
     cd todo_Kaja/todo-frontend
     ```
