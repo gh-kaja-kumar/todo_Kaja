@@ -81,7 +81,7 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
 2. **Start the Frontend Server**:
    - Open another terminal and navigate to the frontend directory:
      ```bash
-     cd flexternship-todo/todo-frontend
+     cd todo_Kaja/todo-frontend
      ```
    - Ensure the `.env.local` file is properly configured:
      ```bash
