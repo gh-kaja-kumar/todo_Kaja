@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Task } from "../../hooks/types"; // Adjust path if needed
+import { Task } from "../../hooks/types";
+import axios from "../../../axiosConfig"; // ✅ Uses baseURL
 
 const EditTask = () => {
   const router = useRouter();
@@ -23,23 +24,18 @@ const EditTask = () => {
 
     const fetchTask = async () => {
       try {
-        const token =
-          typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        const token = localStorage.getItem("token");
 
-        const res = await fetch(
-          `http://localhost:5025/api/TodoItems/${taskId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (!res.ok) throw new Error("Task not found");
+        const res = await axios.get(`/TodoItems/${taskId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        const data: Task = await res.json();
+        const data: Task = res.data;
         setTitle(data.title);
         setDescription(data.description || "");
-        setDueDate(data.dueDate); // Keep the full datetime value
+        setDueDate(data.dueDate);
         setPriority(data.priority);
         setCategory(data.category || "Personal");
         setCompleted(data.isCompleted);
@@ -56,16 +52,12 @@ const EditTask = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = localStorage.getItem("token");
+
     try {
-      const res = await fetch(`http://localhost:5025/api/TodoItems/${taskId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Include the token in the request headers
-        },
-        body: JSON.stringify({
+      await axios.put(
+        `/TodoItems/${taskId}`,
+        {
           id: taskId,
           title,
           description,
@@ -73,10 +65,13 @@ const EditTask = () => {
           priority,
           category,
           isCompleted: completed,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Update failed");
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       router.push("/");
     } catch (err) {
       console.error("Failed to update task:", err);

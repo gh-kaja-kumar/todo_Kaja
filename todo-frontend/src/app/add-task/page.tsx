@@ -18,7 +18,7 @@ export default function AddTaskPage() {
     e.preventDefault();
 
     try {
-      await axios.post('http://localhost:5025/api/TodoItems', {
+      await axios.post('/TodoItems', {
         title,
         description,
         dueDate,

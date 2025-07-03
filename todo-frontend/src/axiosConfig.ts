@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Create an Axios instance with a base URL
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5025/api", // Base URL for API requests
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // Base URL for API requests
 });
 
 // Attach token dynamically on each request

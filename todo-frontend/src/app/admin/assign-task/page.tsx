@@ -1,32 +1,42 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "../../../axiosConfig";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AdminAddTaskPage() {
+  const searchParams = useSearchParams();
+  const prefilledUsername = searchParams.get("username") || "";
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState(0);
   const [category, setCategory] = useState("Personal");
-  const [assignedToUserId, setAssignedToUserId] = useState("");
+  const [assignedToUsername, setAssignedToUsername] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    if (prefilledUsername) {
+      setAssignedToUsername(prefilledUsername);
+    }
+  }, [prefilledUsername]);
 
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:5025/api/TodoItems",
+
+      await axios.post(
+        "/admin/add-task-by-username",
         {
           title,
           description,
           dueDate,
           priority,
           category,
-          assignedToUserId: assignedToUserId ? parseInt(assignedToUserId) : null,
+          assignedToUsername,
         },
         {
           headers: {
@@ -35,56 +45,63 @@ export default function AdminAddTaskPage() {
         }
       );
 
-      router.push("/admin"); // Redirect to admin task list page
+      router.push("/admin");
     } catch (err: any) {
-      console.error(err.response?.data || "Failed to add task");
-      setError(err.response?.data || "Failed to add task");
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.response?.data ||
+        err?.message ||
+        "Failed to add task";
+
+      console.error("Add Task Error:", errorMessage);
+      setError(errorMessage);
     }
   };
 
   return (
     <div className="max-w-xl mx-auto mt-12 px-6 py-8 bg-gray-800 text-white rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Add Task (Admin)</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Assign Task (Admin)</h1>
       {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
       <form onSubmit={handleAddTask} className="space-y-6">
-        {/* Title Field */}
+        {/* Title */}
         <div>
           <label className="block text-sm font-medium mb-1">Title</label>
           <input
             type="text"
-            placeholder="Enter task title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter task title"
             required
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Description Field */}
+        {/* Description */}
         <div>
           <label className="block text-sm font-medium mb-1">Description</label>
           <textarea
-            placeholder="Enter task description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
+            placeholder="Enter task description"
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Due Date Field */}
+        {/* Due Date */}
         <div>
           <label className="block text-sm font-medium mb-1">Due Date</label>
           <input
             type="datetime-local"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Priority Field */}
+        {/* Priority */}
         <div>
           <label className="block text-sm font-medium mb-1">Priority</label>
           <select
@@ -98,7 +115,7 @@ export default function AdminAddTaskPage() {
           </select>
         </div>
 
-        {/* Category Field */}
+        {/* Category */}
         <div>
           <label className="block text-sm font-medium mb-1">Category</label>
           <select
@@ -114,24 +131,29 @@ export default function AdminAddTaskPage() {
           </select>
         </div>
 
-        {/* Assigned To User ID Field */}
+        {/* Assigned To Username */}
         <div>
-          <label className="block text-sm font-medium mb-1">Assign To (User ID)</label>
+          <label className="block text-sm font-medium mb-1">
+            Assign To (Username)
+          </label>
           <input
             type="text"
-            placeholder="Enter User ID to assign this task"
-            value={assignedToUserId}
-            onChange={(e) => setAssignedToUserId(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={assignedToUsername}
+            onChange={(e) => setAssignedToUsername(e.target.value)}
+            placeholder="Enter username"
+            readOnly={!!prefilledUsername}
+            className={`w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              prefilledUsername ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           />
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow transition-all duration-200 cursor-pointer"
         >
-          Add Task
+          Assign Task
         </button>
       </form>
     </div>

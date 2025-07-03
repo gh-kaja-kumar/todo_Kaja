@@ -11,7 +11,7 @@ export interface TaskItemProps {
 export default function TaskItem({ task, refetch, isAdmin = false }: TaskItemProps) {
   const handleCheckboxChange = async () => {
     try {
-      await axios.put(`http://localhost:5025/api/TodoItems/${task.id}`, {
+      await axios.put(`/TodoItems/${task.id}`, {
         ...task,
         isCompleted: !task.isCompleted,
       });
@@ -24,7 +24,7 @@ export default function TaskItem({ task, refetch, isAdmin = false }: TaskItemPro
 
   const handleStarClick = async () => {
     try {
-      await axios.put(`http://localhost:5025/api/TodoItems/${task.id}`, {
+      await axios.put(`/TodoItems/${task.id}`, {
         ...task,
         priority: task.priority === 2 ? 0 : 2,
       });
@@ -118,7 +118,7 @@ export default function TaskItem({ task, refetch, isAdmin = false }: TaskItemPro
               <button
                 onClick={async () => {
                   try {
-                    await axios.delete(`http://localhost:5025/api/TodoItems/${task.id}`);
+                    await axios.delete(`/TodoItems/${task.id}`);
                     refetch();
                   } catch (error) {
                     console.error("Delete failed", error);

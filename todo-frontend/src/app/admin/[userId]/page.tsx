@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import axios from "../../../axiosConfig";
 import TaskList from "../../components/TaskList";
 import FilterBar, { FilterOptions } from "../../components/FilterBar";
@@ -10,6 +10,9 @@ import { Task } from "../../hooks/types";
 
 export default function AdminUserPage() {
   const { userId } = useParams();
+  const searchParams = useSearchParams();
+  const username = searchParams.get("username") || "";
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -60,7 +63,20 @@ export default function AdminUserPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 text-gray-300">
-      <h1 className="text-2xl font-bold mb-4">Admin View: User {userId}</h1>
+      {/* Header with Title + Assign Task */}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">
+          Admin View: User {userId}
+        </h1>
+        {username && (
+          <Link
+            href={`/admin/assign-task?username=${username}`}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow transition duration-200"
+          >
+            + Assign Task 
+          </Link>
+        )}
+      </div>
 
       <FilterBar onFilterChange={setFilter} />
 
@@ -69,6 +85,7 @@ export default function AdminUserPage() {
         {filteredTasks.length - completedCount}
       </div>
 
+      {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between text-sm text-gray-300 mb-1">
           <span>Progress</span>
@@ -82,6 +99,7 @@ export default function AdminUserPage() {
         </div>
       </div>
 
+      {/* Task List */}
       {!loading && !error && (
         <TaskList
           tasks={[...filteredTasks].sort(

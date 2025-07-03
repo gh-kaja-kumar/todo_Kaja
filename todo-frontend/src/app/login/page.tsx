@@ -32,8 +32,10 @@ export default function Login() {
         router.push("/");
       }
     } catch (err: any) {
-      console.error(err.response?.data || "Login failed");
-      setError(err.response?.data || "Login failed");
+      const message =
+        err.response?.data?.message || err.response?.data || "Login failed";
+      console.error(message);
+      setError(message.toString());
     }
   };
 

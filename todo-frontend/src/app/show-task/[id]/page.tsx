@@ -23,7 +23,7 @@ export default function TaskDetailsPage() {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const response = await axios.get(`http://localhost:5025/api/TodoItems/${id}`);
+        const response = await axios.get(`/TodoItems/${id}`);
         setTask(response.data);
       } catch (err) {
         setError('Failed to load task.');

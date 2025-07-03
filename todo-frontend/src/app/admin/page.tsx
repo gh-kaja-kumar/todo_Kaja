@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import axios from "../../axiosConfig";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 
 type Task = {
@@ -35,7 +35,8 @@ export default function AdminTaskPage() {
     }
 
     const decoded: JwtPayload = jwtDecode(token);
-    const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+    const role =
+      decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
 
     if (role !== "Admin") {
       router.push("/");
@@ -60,25 +61,54 @@ export default function AdminTaskPage() {
     fetchTasks();
   }, [router]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-white">📋 All Tasks (Admin View)</h1>
+        <h1 className="text-3xl font-bold text-white">
+          📋 All Tasks (Admin View)
+        </h1>
+
         <div className="flex gap-4">
           {/* Add Task Button */}
           <button
-            onClick={() => router.push("/admin/add-task")}
+            onClick={() => router.push("/admin/assign-task")}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow transition-all duration-200 cursor-pointer"
           >
-            + Add Task (Admin)
+            + Assign Task (Admin)
           </button>
 
-          {/* Search Button */}
+          {/* Search Button by Username */}
           <button
-            onClick={() => {
-              const userId = prompt("Enter User ID to search tasks:");
-              if (userId) {
-                router.push(`/admin/${userId}`);
+            onClick={async () => {
+              const username = prompt("Enter Username to search tasks:");
+              if (!username) return;
+
+              try {
+                const token = localStorage.getItem("token");
+
+                const res = await axios.get(`/admin/user-id/${username}`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                });
+
+                const userId = res.data.userId;
+                if (userId) {
+                  router.push(`/admin/${userId}?username=${username}`);
+                } else {
+                  alert("User ID not found for the given username.");
+                }
+              } catch (err: any) {
+                console.error("Failed to fetch user ID", err);
+                alert(
+                  err.response?.data?.message ||
+                    "An error occurred while fetching user ID."
+                );
               }
             }}
             className="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded shadow flex items-center gap-2 transition-all duration-200 cursor-pointer"
@@ -98,6 +128,14 @@ export default function AdminTaskPage() {
                 d="M10 18l6-6m0 0l-6-6m6 6H3"
               />
             </svg>
+          </button>
+
+          {/* ✅ Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded shadow transition-all duration-200 cursor-pointer"
+          >
+            Logout
           </button>
         </div>
       </div>
@@ -120,18 +158,29 @@ export default function AdminTaskPage() {
             </thead>
             <tbody>
               {tasks.map((task) => (
-                <tr key={task.id} className="border-b border-gray-600 hover:bg-gray-700 transition">
+                <tr
+                  key={task.id}
+                  className="border-b border-gray-600 hover:bg-gray-700 transition"
+                >
                   <td className="px-4 py-2">{task.id}</td>
                   <td className="px-4 py-2">{task.title}</td>
                   <td className="px-4 py-2">{task.ownerUsername}</td>
                   <td className="px-4 py-2">{task.assignedToUsername}</td>
-                  <td className="px-4 py-2">{new Date(task.dueDate).toLocaleDateString()}</td>
-                  <td className="px-4 py-2">{["Low", "Medium", "High"][task.priority]}</td>
+                  <td className="px-4 py-2">
+                    {new Date(task.dueDate).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-2">
+                    {["Low", "Medium", "High"][task.priority]}
+                  </td>
                   <td className="px-4 py-2">
                     {task.isCompleted ? (
-                      <span className="text-green-400 font-semibold">✔ Done</span>
+                      <span className="text-green-400 font-semibold">
+                        ✔ Done
+                      </span>
                     ) : (
-                      <span className="text-yellow-400 font-semibold">⏳ Pending</span>
+                      <span className="text-yellow-400 font-semibold">
+                        ⏳ Pending
+                      </span>
                     )}
                   </td>
                 </tr>

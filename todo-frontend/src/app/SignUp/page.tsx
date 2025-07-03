@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../../axiosConfig";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react"; // Optional: lucide-react for icons
 
@@ -16,14 +16,16 @@ export default function SignUp() {
     e.preventDefault();
     setError("");
     try {
-      await axios.post("http://localhost:5025/api/Users/signup", {
+      await axios.post("/Users/signup", {
         username,
         email,
         password,
       });
       router.push("/login");
     } catch (err: any) {
-      setError(err.response?.data || "Signup failed");
+      const message =
+        err.response?.data?.message || err.response?.data || "Signup failed";
+      setError(message.toString());
     }
   };
 

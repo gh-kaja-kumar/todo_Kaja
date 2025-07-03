@@ -1,9 +1,12 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import useTasks from "./hooks/useTasks";
 import TaskList from "./components/TaskList";
 import FilterBar, { FilterOptions } from "./components/FilterBar";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 
 export default function Home() {
   const { tasks, loading, error, refetch } = useTasks();
@@ -13,23 +16,39 @@ export default function Home() {
     priority: "",
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // Check if the user is logged in
+    setIsLoggedIn(!!token);
+
+    // 🔁 Redirect admin to /admin if on home page
+    if (token) {
+      try {
+        const decoded: { [key: string]: any } = jwtDecode(token);
+        const role =
+          decoded[
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+          ];
+        if (role === "Admin") {
+          router.replace("/admin");
+        }
+      } catch (err) {
+        console.error("Token decode failed", err);
+      }
+    }
   }, []);
 
-  // Filter tasks based on selected filter options
+  // Filter logic
   const filteredTasks = tasks.filter((task) => {
     const now = new Date();
-
     const statusMatch =
       filter.status === "" ||
       (filter.status === "completed" && task.isCompleted) ||
       (filter.status === "incomplete" && !task.isCompleted) ||
       (filter.status === "overdue" &&
         !task.isCompleted &&
-        new Date(task.dueDate) < now); // ✅ Added overdue logic
+        new Date(task.dueDate) < now);
 
     const categoryMatch =
       filter.category === "" ||
@@ -41,14 +60,13 @@ export default function Home() {
     return statusMatch && categoryMatch && priorityMatch;
   });
 
-  // ✅ Sort by DueDate (oldest first)
+  // Sort by due date
   const sortedTasks = filteredTasks.sort(
     (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
   );
 
   const completedCount = filteredTasks.filter((t) => t.isCompleted).length;
   const incompleteCount = filteredTasks.length - completedCount;
-
   const progressPercentage =
     tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
 
@@ -67,9 +85,9 @@ export default function Home() {
             <button
               className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer"
               onClick={() => {
-                localStorage.removeItem("token"); // Remove JWT
-                setIsLoggedIn(false); // Update state
-                window.location.href = "/login"; // Redirect to login
+                localStorage.removeItem("token");
+                setIsLoggedIn(false);
+                window.location.href = "/login";
               }}
             >
               Logout
@@ -109,7 +127,6 @@ export default function Home() {
       ) : (
         <>
           <FilterBar onFilterChange={setFilter} />
-
           <div className="mb-4 text-sm text-gray-400">
             Completed: {completedCount} | Incomplete: {incompleteCount}
           </div>
@@ -129,7 +146,7 @@ export default function Home() {
           {loading && <p>Loading...</p>}
           {error && <p className="text-red-500">Error: {error}</p>}
           {!loading && !error && (
-            <TaskList tasks={filteredTasks} refetch={refetch} />
+            <TaskList tasks={sortedTasks} refetch={refetch} />
           )}
         </>
       )}

@@ -37,27 +37,82 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
     ```bash
     cd flexternship-todo/todo-frontend
     ```
-2. Install dependencies:
+2. Copy the `.env.example` file to `.env.local`:
+    ```bash
+    cp .env.example .env.local
+    ```
+3. Open the `.env.local` file and ensure the `NEXT_PUBLIC_API_BASE_URL` is set to your backend's base URL:
+    ```bash
+    NEXT_PUBLIC_API_BASE_URL=http://localhost:5025/api
+    ```
+4. Install dependencies:
     ```bash
     npm install
     ```
-3. Start the development server:
+5. Start the development server:
     ```bash
     npm run dev
     ```
     The frontend will be available at `http://localhost:3000`.
 
-> ℹ️ Note: All API URLs in the frontend are currently hardcoded to `http://localhost:5025/api`.  
-> If your backend runs on a **different port**, replace the port number in those URLs accordingly.  
-> (In most cases, the default port `5025` will remain the same.)
+---
+
+### Notes:
+- **Environment Variables**:
+  - The `.env.example` file contains a template for environment variables. Ensure you copy it to `.env.local` and update the values as needed.
+- **Backend Port**:
+  - If your backend runs on a different port, update the `NEXT_PUBLIC_API_BASE_URL` in the `.env.local` file accordingly.
 
 ---
 
 ## How to Run the Project
 
-1. Start the backend server by running `dotnet run` in the [TodoApi] directory.
-2. Start the frontend server by running `npm run dev` in the [todo-frontend] directory.
-3. Open your browser and navigate to `http://localhost:3000` to interact with the application.
+1. **Start the Backend Server**:
+   - Open a new terminal and navigate to the backend directory:
+     ```bash
+     cd flexternship-todo/TodoApi
+     ```
+   - Run the backend server:
+     ```bash
+     dotnet run
+     ```
+   - The backend will be available at `http://localhost:5025`.
+
+2. **Start the Frontend Server**:
+   - Open another terminal and navigate to the frontend directory:
+     ```bash
+     cd flexternship-todo/todo-frontend
+     ```
+   - Ensure the `.env.local` file is properly configured:
+     ```bash
+     cp .env.example .env.local
+     ```
+     - Open `.env.local` and verify the `NEXT_PUBLIC_API_BASE_URL` is set to:
+       ```bash
+       NEXT_PUBLIC_API_BASE_URL=http://localhost:5025/api
+       ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Start the frontend server:
+     ```bash
+     npm run dev
+     ```
+   - The frontend will be available at `http://localhost:3000`.
+
+3. **Access the Application**:
+   - Open your browser and navigate to `http://localhost:3000` to interact with the application.
+
+4. **Test the Application**:
+   - Register a new user or log in with an existing account.
+   - Add, edit, delete, and manage tasks.
+   - If you are an admin, test admin-specific features like managing other users' tasks.
+   - To test the admin portal, use the following credentials:
+     - **Username**: `admin`
+     - **Password**: `admin`
+   - For backend testing through Swagger, navigate to:
+     - [http://localhost:5025/swagger](http://localhost:5025/swagger)
 
 ---
 
@@ -93,7 +148,8 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
 
 9. **Admin Mode**  
    Admins can:
-   - View and manage tasks of any user via `/admin/{userId}`
+   - View all tasks 
+   - View and manage tasks of any specific user via username or `/admin/{userId}`
    - Edit or delete any task (without restrictions)
    - Assign tasks to other users
 
@@ -134,7 +190,7 @@ Users can interact with the application by:
    Tasks past their due date are automatically labeled as **Overdue** for visibility.
 
 8. **Admin Actions**  
-   Admins can access `/admin/{userId}` to manage another user’s tasks fully.
+   Admins can access `/admin/{userId}` or via username to manage another user’s tasks fully.
 
 9. **Logout**  
    End your session securely using the logout button, which clears your token from local storage.
@@ -176,16 +232,21 @@ TodoApi/
 │   ├── LoginDto.cs         # DTO for user login
 ├── Migrations/             # EF Core migrations
 │   ├── SeededData.Designer.cs # Migration for seeded data
+│   ├── InitWithRoles.cs    # Initial migration with roles
+│   ├── TodoDbContextModelSnapshot.cs # Snapshot of the database schema
 ├── Models/                 # Database models
 │   ├── AppUser.cs          # User model
 │   ├── TodoItem.cs         # Task model
 ├── Services/               # Business logic services
 │   ├── IUserService.cs     # Interface for user service
 │   ├── UserService.cs      # Implementation of user service
+├── Properties/             # Project properties
+│   ├── launchSettings.json # Launch settings for development
 ├── appsettings.json        # Application settings
 ├── appsettings.Development.json # Development-specific settings
 ├── Program.cs              # Entry point for the backend application
 ├── TodoApi.csproj          # Project file for the backend
+├── TodoApi.http            # HTTP file for testing API endpoints
 ├── todo.db                 # SQLite database file
 ```
 
@@ -208,9 +269,18 @@ todo-frontend/
 │   │   │   ├── page.tsx    # Signup form
 │   │   ├── login/          # Login page
 │   │   │   ├── page.tsx    # Login form
+│   │   ├── admin/          # Admin pages
+│   │   │   ├── assign-task/ # Assign task page
+│   │   │   │   ├── page.tsx
+│   │   │   ├── [userId]/   # Admin user-specific tasks
+│   │   │   │   ├── page.tsx
+│   │   │   ├── page.tsx    # Admin dashboard
 │   ├── axiosConfig.ts      # Axios configuration for API requests
+├── .env.example            # Example environment variables
+├── .env.local              # Local environment variables
 ├── package.json            # Project dependencies
 ├── tsconfig.json           # TypeScript configuration
 ├── next.config.ts          # Next.js configuration
+├── README.md               # Frontend-specific README
 ```
 
