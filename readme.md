@@ -225,11 +225,14 @@ TodoApi/
 ├── Controllers/            # API controllers
 │   ├── UsersController.cs  # Handles user-related endpoints
 │   ├── TodoItemsController.cs # Handles task-related endpoints
+│   ├── AdminController.cs  # Handles admin-specific endpoints
 ├── Data/                   # Database context and configurations
 │   ├── TodoDbContext.cs    # Entity Framework database context
 ├── DTOs/                   # Data Transfer Objects
 │   ├── RegisterDto.cs      # DTO for user registration
 │   ├── LoginDto.cs         # DTO for user login
+│   ├── TodoItemDto.cs      # DTO for task data
+│   ├── AdminDto.cs         # DTO for admin-specific actions
 ├── Migrations/             # EF Core migrations
 │   ├── SeededData.Designer.cs # Migration for seeded data
 │   ├── InitWithRoles.cs    # Initial migration with roles
@@ -240,6 +243,8 @@ TodoApi/
 ├── Services/               # Business logic services
 │   ├── IUserService.cs     # Interface for user service
 │   ├── UserService.cs      # Implementation of user service
+│   ├── IAdminService.cs    # Interface for admin service
+│   ├── AdminService.cs     # Implementation of admin service
 ├── Properties/             # Project properties
 │   ├── launchSettings.json # Launch settings for development
 ├── appsettings.json        # Application settings
@@ -248,5 +253,39 @@ TodoApi/
 ├── TodoApi.csproj          # Project file for the backend
 ├── TodoApi.http            # HTTP file for testing API endpoints
 ├── todo.db                 # SQLite database file
+```
+
+### Frontend (`todo-frontend`)
+```plaintext
+todo-frontend/
+├── .next/                  # Next.js build output
+├── public/                 # Static assets
+├── src/                    # Source code
+│   ├── app/                # Application pages and components
+│   │   ├── components/     # Reusable UI components
+│   │   │   ├── TaskList.tsx # Component for displaying task lists
+│   │   │   ├── TaskItem.tsx # Component for individual task items
+│   │   ├── hooks/          # Custom React hooks
+│   │   │   ├── useTasks.ts # Hook for fetching tasks
+│   │   │   ├── types.ts    # Type definitions
+│   │   ├── edit-task/      # Edit task page
+│   │   │   ├── [id]/page.tsx # Dynamic route for editing tasks
+│   │   ├── signup/         # Signup page
+│   │   │   ├── page.tsx    # Signup form
+│   │   ├── login/          # Login page
+│   │   │   ├── page.tsx    # Login form
+│   │   ├── admin/          # Admin pages
+│   │   │   ├── assign-task/ # Assign task page
+│   │   │   │   ├── page.tsx
+│   │   │   ├── [userId]/   # Admin user-specific tasks
+│   │   │   │   ├── page.tsx
+│   │   │   ├── page.tsx    # Admin dashboard
+│   ├── axiosConfig.ts      # Axios configuration for API requests
+├── .env.example            # Example environment variables
+├── .env.local              # Local environment variables
+├── package.json            # Project dependencies
+├── tsconfig.json           # TypeScript configuration
+├── next.config.ts          # Next.js configuration
+├── README.md               # Frontend-specific README
 ```
 
