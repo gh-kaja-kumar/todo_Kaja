@@ -14,7 +14,7 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
     ```
 2. Navigate to the backend directory:
     ```bash
-    cd flexternship-todo/TodoApi
+    cd todo_Kaja/TodoApi
     ```
 3. Restore NuGet packages:
     ```bash
@@ -35,7 +35,7 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
 ### Frontend Setup (todo-frontend)
 1. Navigate to the frontend directory:
     ```bash
-    cd flexternship-todo/todo-frontend
+    cd todo_Kaja/todo-frontend
     ```
 2. Copy the `.env.example` file to `.env.local`:
     ```bash
@@ -70,7 +70,7 @@ The **Flexternship Todo Application** is a full-stack task management applicatio
 1. **Start the Backend Server**:
    - Open a new terminal and navigate to the backend directory:
      ```bash
-     cd flexternship-todo/TodoApi
+     cd todo_Kaja/TodoApi
      ```
    - Run the backend server:
      ```bash
@@ -248,39 +248,5 @@ TodoApi/
 ├── TodoApi.csproj          # Project file for the backend
 ├── TodoApi.http            # HTTP file for testing API endpoints
 ├── todo.db                 # SQLite database file
-```
-
-### Frontend (`todo-frontend`)
-```plaintext
-todo-frontend/
-├── .next/                  # Next.js build output
-├── public/                 # Static assets
-├── src/                    # Source code
-│   ├── app/                # Application pages and components
-│   │   ├── components/     # Reusable UI components
-│   │   │   ├── TaskList.tsx # Component for displaying task lists
-│   │   │   ├── TaskItem.tsx # Component for individual task items
-│   │   ├── hooks/          # Custom React hooks
-│   │   │   ├── useTasks.ts # Hook for fetching tasks
-│   │   │   ├── types.ts    # Type definitions
-│   │   ├── edit-task/      # Edit task page
-│   │   │   ├── [id]/page.tsx # Dynamic route for editing tasks
-│   │   ├── signup/         # Signup page
-│   │   │   ├── page.tsx    # Signup form
-│   │   ├── login/          # Login page
-│   │   │   ├── page.tsx    # Login form
-│   │   ├── admin/          # Admin pages
-│   │   │   ├── assign-task/ # Assign task page
-│   │   │   │   ├── page.tsx
-│   │   │   ├── [userId]/   # Admin user-specific tasks
-│   │   │   │   ├── page.tsx
-│   │   │   ├── page.tsx    # Admin dashboard
-│   ├── axiosConfig.ts      # Axios configuration for API requests
-├── .env.example            # Example environment variables
-├── .env.local              # Local environment variables
-├── package.json            # Project dependencies
-├── tsconfig.json           # TypeScript configuration
-├── next.config.ts          # Next.js configuration
-├── README.md               # Frontend-specific README
 ```
 
